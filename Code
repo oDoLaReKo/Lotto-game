@@ -1,0 +1,323 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApp1
+{
+
+    class Program
+    {
+        static int [] sprawdzam(int[] liczbywygr, int[,] strzaly,int ilosc_kuponow)
+        {
+            int [] licznik_wygranych = new int[6];//kazdy kupon ma swoj licznik ile liczb zostalo trafioncyh 
+            int[,] tab = new int[6,6];//liczby ktore wygraly
+
+            Console.WriteLine("Liczby wygrywajace to :");
+            for (int i = 0; i < 6; i++)
+            {
+                Console.Write(liczbywygr[i] + " ");
+            }
+            Console.WriteLine();
+           
+            
+            for (int d = 0; d < 6; d++)
+            {
+
+
+                for (int i = 0; i < 6; i++)
+                {
+                    for (int j = 0; j < 6; j++)
+                    {
+
+                        if (strzaly[d, j] == liczbywygr[i])
+                        {
+
+                            tab[d, j] = strzaly[d, j];
+                            strzaly[d, j] = 0;
+                         
+                            licznik_wygranych[d]++;
+                            
+                        }
+                        
+                    }
+                }
+            }
+
+
+            for(int i=0;i<ilosc_kuponow;i++)
+             Console.WriteLine("W kuponie nr. "+(i+1)+" Udalo ci sie trafic " + licznik_wygranych[i] + " liczb");
+
+            for (int j = 0; j < ilosc_kuponow; j++)
+            {
+                Console.Write(j + 1 + ". ");
+                for (int i = 0; i < 6; i++)
+                {
+                    if (tab[j, i] != 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+
+                        Console.Write(tab[j, i] + " ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    if (strzaly[j, i] != 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write(strzaly[j, i] + " ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                }
+                Console.WriteLine();
+            }
+
+            
+
+            return licznik_wygranych;//zwraca dla kazdego kuponu ilosc trafionych liczb
+        }
+        static int[] Obstawianie()
+        {
+            int liczba = 0;
+            int[] tab = new int[6];
+            Console.WriteLine("Podaj swoje szczesliwe liczby ktore chcesz obstawic:");
+            for (int i = 0; i < 6;)
+            {
+                Console.Write("Twoja Liczba " + (i + 1) + " na 6 to ");
+                bool a = int.TryParse(Console.ReadLine(), out liczba);
+                if (!a)
+                {
+                    Console.WriteLine("To nie liczba");
+                }
+                else if (liczba > 50 || liczba <= 0)
+                {
+                    Console.WriteLine("Liczba jest z poza zakresu");
+                }
+                else if (tab.Contains(liczba))
+                    Console.WriteLine("Juz podales taka liczbe");
+                else
+                {
+                    tab[i] = liczba;
+                    i++;
+                }
+            }
+            return tab;
+        }
+
+        static int[] Losowanie()
+        {
+            int a = 0;
+            int[] tab = new int[6];
+            Random r = new Random();
+            for (int i = 0; i < 6;)
+            {
+                a = r.Next(1, 51);
+
+                if (!tab.Contains(a))
+                {
+                    tab[i] = a;
+                    i++;
+                }
+
+
+
+
+            }
+            return tab;
+        }
+        static int Pula()
+        {
+            int a;
+            Random r = new Random();
+            a = r.Next(1, 20) * 1000000;
+            
+
+            return a;
+        }
+        static int Wygrana(int pula,int [] liczba_razy_danych_trafien)
+        {
+            Random r = new Random();
+            int a = r.Next(0, 4);
+           int wygrana = 0;
+
+
+
+
+
+
+            if (liczba_razy_danych_trafien[0] != 0)
+                wygrana = wygrana + 24 * liczba_razy_danych_trafien[0];
+            if (liczba_razy_danych_trafien[1] != 0)
+                wygrana =wygrana+ r.Next(200, 300) * liczba_razy_danych_trafien[1];
+            if (liczba_razy_danych_trafien[2] != 0)
+                wygrana = wygrana + r.Next(4000, 8000) * liczba_razy_danych_trafien[2];
+            if (liczba_razy_danych_trafien[3] != 0)
+            { wygrana = wygrana + (pula * liczba_razy_danych_trafien[3] / (a+1));
+                
+                if(a==0)
+                    Console.WriteLine("Trafiles szostke kumulacja !");
+                else if(a==1)
+                Console.WriteLine("Niestety poza toba szostke trafila rowniez 1 osoba");
+                else
+                    Console.WriteLine("Niestety poza toba szostke trafily rowniez {0} osoby",a);
+            }                             
+
+            return wygrana;
+        }
+        static int [] Zliczanie_trafien(int [] trafienia)
+        {
+            int[] a=new int[4];//tab0 ilosc 3jek tab1 ilosc 4rek tab2 ilosc 5tek tab3 ilosc6
+            for (int i = 0; i < trafienia.Length; i++)
+            {
+                if (trafienia[i] == 3)
+                    a[0]++;
+                else if(trafienia[i] == 4)
+                    a[1]++;
+                else if (trafienia[i] == 5)
+                    a[2]++;
+                else if (trafienia[i] == 6)
+                    a[3]++;
+            }
+
+
+            return a;
+        }
+       
+
+        static void Main(string[] args)
+        {
+            
+            int licznik_kuponow = 0;
+            int[] tab = new int[6];//liczby wygrywajace
+            int[] tab2 = new int[6];//pojedynczy kupon
+            int[] trafienia = new int[6];//dla kazego kuponu liczba cyfr tore trafil
+            int[] trafienia_konkretnych_iloscli_liczb = new int[6];//ilosc trafien 3,4,5,6
+            int[,] obstawiania = new int[6, 6];//pula kuonpw
+            int wygrana = 0;
+            tab = Losowanie();
+            int pula = Pula();
+            int zmienna = 0;
+            int stan_konta = 200;
+            int dzien = 1;
+
+
+
+
+            do
+            {
+                
+                Console.WriteLine("Dzien " + dzien);
+                Console.WriteLine("Witaj w lotto!");
+                Console.WriteLine("Twoj stan konta wynosi: " + stan_konta);
+                Console.WriteLine("Do wygrania jest: " + pula + "zl");
+                Console.WriteLine("1. Postaw kupon koszt: 7zl");
+                Console.WriteLine("2. Sprawdz wyniki");
+                Console.WriteLine("3. Zakoncz gre");
+                Console.WriteLine("4. Rozpocznij kolejny dzien ");
+
+                bool poprawna = int.TryParse(Console.ReadLine(), out zmienna);
+
+                if (poprawna && zmienna > 0 && zmienna < 5)
+                {
+                    switch (zmienna)
+                    {
+                        case 1:
+                            Console.Clear();
+                            for (int i = 0; i < 6; i++)
+                            {
+                                Console.Write(tab[i] +" ");
+                            }
+                            if (stan_konta < 7)
+                            {
+                                Console.WriteLine("Nie stac cie aby postawic wiecej kuponow");
+                            }
+                            else if (licznik_kuponow > 5)
+                            {
+                                Console.WriteLine("Wykozystales juz maksymalna ilosc kuponow na to losowanie ");
+                            }
+                            else if (licznik_kuponow == -1)
+                            {
+                                Console.WriteLine("SPrawdziles juz wyniki zapraszmy do obstawiana jutro");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Kupon nr" + (licznik_kuponow + 1) + "/6");
+                                tab2 = Obstawianie();
+                                for (int i = 0; i < 6; i++)
+                                {
+                                    obstawiania[licznik_kuponow, i] = tab2[i];
+                                }
+
+
+
+
+                                stan_konta -= 7;
+                                licznik_kuponow++;
+                                Console.Clear();
+                              
+                                Console.WriteLine("Twoje kupony:");
+                                int pom = 0;
+                                for (int j = 0; j < licznik_kuponow; j++)
+                                {
+
+
+                                    Console.Write((pom + 1) + ". ");
+                                    for (int i = 0; i < 6; i++)
+                                    {
+                                        Console.Write(obstawiania[pom, i] + " ");
+                                    }
+                                    Console.WriteLine();
+                                    pom++;
+                                }
+
+
+
+                            }
+
+                            break;
+                        case 2:
+                            Console.Clear();
+                            trafienia = sprawdzam(tab, obstawiania, licznik_kuponow);
+                            trafienia_konkretnych_iloscli_liczb = Zliczanie_trafien(trafienia);
+                            wygrana = Wygrana(pula, trafienia_konkretnych_iloscli_liczb);
+                            Console.WriteLine("Gratulujemy twoja wygrana to: " + wygrana + " zl");
+                            stan_konta += wygrana;
+                            Console.WriteLine("a twoj stan konta wynosi: " + stan_konta);
+                            licznik_kuponow = -1;
+
+
+
+
+                            break;
+                        case 3:
+                            Console.Clear();
+                            Console.WriteLine("Dziekujemy za gre twoja laczna wygrana to: " + (stan_konta - 200) + " zl");
+                            break;
+                        case 4:
+
+                            tab = Losowanie();
+                            pula = Pula();
+                            licznik_kuponow = 0;                        
+                            dzien++;
+                            Console.Clear();
+                            break;
+
+                    }
+                    Console.WriteLine();
+
+
+                }
+
+                else
+                {
+                    Console.WriteLine("Bledny wybor");
+                   
+                    
+                }
+            }
+            while (zmienna != 3);
+
+           
+
+            Console.ReadKey();
+        }
+    }
+}
